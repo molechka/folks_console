@@ -31,6 +31,7 @@ public class Folk extends AbstractEntity {
     private String patronymic;
 
     // Предпочитаемое имя
+    @Column(name = "preferred_name")
     @Searchable(search = true)
     private String preferredName;
 
@@ -41,14 +42,17 @@ public class Folk extends AbstractEntity {
 
     // Дата рождения
     @Searchable(search = true, filter = true, sort = true)
+    @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
     private Date birthDate;
 
     // Место рождения
+    @Column(name = "birth_place")
     private String birthPlace;
 
     // Дата первого посещения конференции
     @Searchable(filter = true)
+    @Column(name = "first_conf_date")
     @Temporal(TemporalType.DATE)
     private Date firstConfDate;
 
@@ -61,6 +65,7 @@ public class Folk extends AbstractEntity {
 
     // Дата начала работы
     @Temporal(TemporalType.DATE)
+    @Column(name = "job_start_date")
     private Date jobStartDate;
 
     // Автор изменений
@@ -82,15 +87,18 @@ public class Folk extends AbstractEntity {
 
     /** Признак: VIP-клиент */
     @Searchable(filter = true)
+    @Column(name = "vip_flag")
     @Enumerated(value = EnumType.ORDINAL)
     private ThreeStateStatus vipFlag = ThreeStateStatus.UNKNOWN;
 
     // Какой раз на конфе
     @Searchable(filter = true)
+    @Column(name = "visit_count")
     private Integer visitCount;
 
     // Средний рейтинг участника
     @Searchable(filter = true)
+    @Column(name = "average_rating")
     private BigDecimal averageRating;
 
     // Язык контакта с Клиентом
@@ -98,6 +106,7 @@ public class Folk extends AbstractEntity {
 
     // Дата актуальности
     @Temporal(TemporalType.DATE)
+    @Column(name = "actuality_date")
     private Date actualityDate;
 
     @Searchable(filter = true)

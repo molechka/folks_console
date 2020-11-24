@@ -1,0 +1,13 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Nov 23 22:16:29 MSK 2020
+utils-lucene-20.15-SNAPSHOT-tests.jar>=
+utils-lucene-20.15-20201110.083625-12.jar>maven.hflabs.ru=
+utils-lucene-20.15-20201110.083625-12.pom>maven.hflabs.ru=
+utils-lucene-20.15-SNAPSHOT-sources.jar>=
+utils-lucene-20.15-20201121.032217-17.jar>maven.hflabs.ru=
+utils-lucene-20.15-20201106.142414-10.jar>maven.hflabs.ru=
+utils-lucene-20.15-SNAPSHOT.jar>=
+utils-lucene-20.15-20201106.142414-10.pom>maven.hflabs.ru=
+utils-lucene-20.15-20201121.032217-17.pom>maven.hflabs.ru=
+utils-lucene-20.15-SNAPSHOT.pom>=
+utils-lucene-20.15-SNAPSHOT-test-sources.jar>=

@@ -1,0 +1,14 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Nov 23 22:16:10 MSK 2020
+parent-19.8-SNAPSHOT.pom>=
+parent-19.8-20201003.030024-7.pom>maven.hflabs.ru=
+parent-19.8-20200919.030006-5.pom>maven.hflabs.ru=
+parent-19.8-20201114.025348-14.pom>maven.hflabs.ru=
+parent-19.8-20201010.030017-8.pom>maven.hflabs.ru=
+parent-19.8-20200926.033855-6.pom>maven.hflabs.ru=
+parent-19.8-20201022.053410-10.pom>maven.hflabs.ru=
+parent-19.8-20201107.033052-13.pom>maven.hflabs.ru=
+parent-19.8-20200829.042557-3.pom>maven.hflabs.ru=
+parent-19.8-20200905.030017-4.pom>maven.hflabs.ru=
+parent-19.8-20201121.032026-15.pom>maven.hflabs.ru=
+parent-19.8-20201024.030025-11.pom>maven.hflabs.ru=

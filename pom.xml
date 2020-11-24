@@ -6,23 +6,21 @@
     <parent>
         <groupId>ru.hflabs</groupId>
         <artifactId>parent</artifactId>
-        <version>15.0-SNAPSHOT</version>
-        <relativePath>lib/ru/hflabs/parent/15.0-SNAPSHOT/parent-15.0-20171004.172905-1.pom</relativePath>
+        <version>19.8-SNAPSHOT</version>
+        <relativePath>lib/ru/hflabs/parent/19.8-SNAPSHOT/parent-19.8-SNAPSHOT.pom</relativePath>
     </parent>
 
     <groupId>ru.olgak</groupId>
     <artifactId>folks</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
     <name>Folks example</name>
 
     <properties>
-        <hibernate.version>4.2.2.Final</hibernate.version>
-        <ru.hflabs.util.version>1.7.7-SNAPSHOT</ru.hflabs.util.version>
+        <ru.hflabs.util.version>20.15-SNAPSHOT</ru.hflabs.util.version>
         <maven.checkstyle.skip>true</maven.checkstyle.skip>
-        <cxf.property>3.2.5</cxf.property>
     </properties>
 
     <build>
@@ -40,31 +38,11 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <executions>
-                    <execution>
-                        <id>checkstyle</id>
-                        <goals>
-                            <goal>checkstyle</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <skip>${maven.checkstyle.skip}</skip>
-                    <failsOnError>true</failsOnError>
-                    <configLocation>${project.basedir}/lib/checkstyle.xml</configLocation>
-                    <linkXRef>false</linkXRef>
-                </configuration>
-            </plugin>
 
             <!--<plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.property}</version>
+                <version>${cxf.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -114,7 +92,12 @@
         <repository>
             <id>project.local</id>
             <name>project</name>
-            <url>file:${project.basedir}/lib</url>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
@@ -123,7 +106,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.16</version>
             <scope>provided</scope>
         </dependency>
 
@@ -148,25 +130,35 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.hflabs</groupId>
             <artifactId>utils-spring</artifactId>
             <version>${ru.hflabs.util.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ru.hflabs</groupId>
+                    <artifactId>utils-crypto</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>ru.hflabs</groupId>
             <artifactId>utils-lucene</artifactId>
             <version>${ru.hflabs.util.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ru.hflabs</groupId>
+                    <artifactId>utils-crypto</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -180,31 +172,26 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${springframework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>${springframework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>${springframework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>${springframework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>1.3.1.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -217,14 +204,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
-            <version>${springframework.version}</version>
             <!--<scope>runtime</scope>-->
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <version>${springframework.version}</version>
         </dependency>
 
         <dependency>
@@ -238,13 +223,13 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.property}</version>
+            <version>${cxf.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.property}</version>
+            <version>${cxf.version}</version>
         </dependency>
 
         <dependency>
@@ -256,13 +241,11 @@
         <dependency>
             <groupId>org.apache.cxf.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.9.6</version>
         </dependency>
 
         <!-- ########################################################################################## -->
@@ -282,16 +265,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.swift.common</groupId>
-            <artifactId>jira-soap</artifactId>
-            <version>5.0.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.property}</version>
+            <version>${cxf.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -312,6 +288,24 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-rest-java-client-core</artifactId>
+            <version>5.2.0</version>
+            <!--<systemPath>/lib/com/atlassian/jira/jira-rest-java-client-core/5.2.0/jira-rest-java-client-core-5.2.0.jar</systemPath>-->
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

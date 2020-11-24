@@ -1,9 +1,8 @@
 package ru.olgak.folks.api;
 
-import ru.olgak.folks.api.annotation.Searchable;
-
 import lombok.Getter;
 import lombok.Setter;
+import ru.olgak.folks.api.annotation.Searchable;
 import ru.olgak.folks.api.model.DeviceOS;
 import ru.olgak.folks.api.model.DeviceType;
 
@@ -16,6 +15,7 @@ import java.util.Date;
 @Entity
 public class Device extends AbstractEntity {
 
+    @JoinColumn(name = "folk")
     @ManyToOne(fetch = FetchType.EAGER)
     private Folk folk;
 
@@ -34,6 +34,7 @@ public class Device extends AbstractEntity {
     private String model;
 
     // Серийный номер
+    @Column(name = "serial_number")
     private String serialNumber;
 
     // Автор изменений
@@ -41,6 +42,7 @@ public class Device extends AbstractEntity {
     private String author;
 
     // Дата актуальности
+    @Column(name = "actuality_date")
     @Temporal(TemporalType.DATE)
     private Date actualityDate;
 

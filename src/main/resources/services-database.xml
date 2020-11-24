@@ -26,6 +26,7 @@
             <util:map key-type="java.lang.String" value-type="java.lang.String">
                 <entry key="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
                 <entry key="hibernate.format_sql" value="true"/>
+                <!--<entry key="hibernate.implicit_naming_strategy" value="legacy-jpa"/>-->
                 <entry key="hibernate.hbm2ddl.auto" value="validate"/>
                 <entry key="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
             </util:map>

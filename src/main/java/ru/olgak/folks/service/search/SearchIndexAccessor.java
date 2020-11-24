@@ -7,19 +7,19 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.search.ReferenceManager;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.hflabs.util.core.Pair;
 import ru.hflabs.util.io.IOUtils;
+import ru.hflabs.util.lucene.LuceneCommitMode;
 import ru.hflabs.util.lucene.LuceneIndexManager;
-import ru.hflabs.util.lucene.LuceneModifierUtil;
-import ru.hflabs.util.lucene.LuceneUtil;
+import ru.hflabs.util.lucene.LuceneModifyUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,7 +46,7 @@ public class SearchIndexAccessor implements LuceneIndexManager {
 
     public SearchIndexAccessor() {
         this.indexLock = new ReentrantLock();
-        this.indexDirectory = new Pair<Directory, File>(new RAMDirectory(), null);
+        this.indexDirectory = new Pair<>(new ByteBuffersDirectory(), null);
     }
 
 
@@ -108,22 +108,13 @@ public class SearchIndexAccessor implements LuceneIndexManager {
     }
 
     /**
-     * Освобождает ресурc
-     *
-     * @param writer индекс записи
-     */
-    private void releaseWriter(IndexWriter writer) {
-        assert indexWriter == writer : "Released index writer is not equal monitored";
-        indexLock.unlock();
-    }
-
-    /**
      * Выполняет запись модифицированных данных в индексе
      *
-     * @param writer индекс записи
+     * @param writer       индекс записи
      * @param changesCount количество изменений в индексе
      */
-    public void commitWriter(IndexWriter writer, int changesCount) {
+    @Override
+    public void commitWriter(IndexWriter writer, int changesCount, LuceneCommitMode luceneCommitMode) {
         assert indexWriter == writer : "Released index writer is not equal monitored";
         try {
             writer.commit();
@@ -162,7 +153,7 @@ public class SearchIndexAccessor implements LuceneIndexManager {
             try {
                 writer.commit();
             } finally {
-                commitWriter(writer, -1);
+                commitWriter(writer, -1, LuceneCommitMode.FORCE);
             }
         }
         // Создаем слушателя удаления не используемых файлов
@@ -204,7 +195,7 @@ public class SearchIndexAccessor implements LuceneIndexManager {
         public void afterRefresh(boolean didRefresh) throws IOException {
             if (didRefresh && indexLock.tryLock()) {
                 try {
-                    LuceneModifierUtil.doWithCallback("delete unused reference files", SearchIndexAccessor.this, LuceneModifierUtil.createDeleteUnusedFilesCallback());
+                    LuceneModifyUtil.modify(SearchIndexAccessor.this, null, new LuceneModifyUtil.DeleteUnusedFiles<>(), Collections.emptyList());
                 } finally {
                     indexLock.unlock();
                 }

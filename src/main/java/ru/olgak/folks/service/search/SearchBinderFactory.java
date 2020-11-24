@@ -24,7 +24,6 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static java.lang.String.format;
 import static ru.hflabs.util.lucene.LuceneUtil.*;
 
 /**
@@ -45,7 +44,12 @@ public class SearchBinderFactory<E extends Folk> {
     }
 
     public SearchBinderTemplate<E> createSearchBinder(final Class<E> binderClass) {
-        return new SearchBinderTemplate<E>() {
+        return new SearchBinderTemplate<>() {
+            @Override
+            public Serializable getPrimaryKeyByEssence(E e) {
+                return e.getId();
+            }
+
             @Override
             public Document reverseConvert(E e) {
                 try {
@@ -66,7 +70,7 @@ public class SearchBinderFactory<E extends Folk> {
 
             private <T> Document doBuildDocument(Class<T> binderClass, T entity) throws IllegalAccessException {
                 Document result = new Document();
-                List<IndexableField> defaultSearchFields = new ArrayList<IndexableField>();
+                List<IndexableField> defaultSearchFields = new ArrayList<>();
 
                 IndexableField filterField;
                 IndexableField searchField;
@@ -156,7 +160,7 @@ public class SearchBinderFactory<E extends Folk> {
     }
 
     public Collection<SearchableField> getBinderFields(Class<?> binderClass, final int... states) {
-        return Collections2.filter(binderClassesHolder.getValue(binderClass), new Predicate<SearchableField>() {
+        return Collections2.filter(binderClassesHolder.getValue(binderClass), new Predicate<>() {
             @Override
             public boolean apply(SearchableField input) {
                 for (Integer state : states) {
@@ -240,7 +244,7 @@ public class SearchBinderFactory<E extends Folk> {
 
         @Override
         protected Collection<SearchableField> createValue(Class<?> key) {
-            final Collection<SearchableField> fields = new LinkedHashSet<SearchableField>();
+            final Collection<SearchableField> fields = new LinkedHashSet<>();
             // Добавляем первичный ключ
                 /*{
                     final Field field = ReflectionUtil.findField(key, primaryKeyFieldName);
@@ -287,7 +291,7 @@ public class SearchBinderFactory<E extends Folk> {
                     return field;
                 }
             }
-            throw new IllegalArgumentException(format("Search/filtering for field '%s' in class '%s' is prohibited", key.second, key.first));
+            throw new IllegalArgumentException(String.format("Search/filtering for field '%s' in class '%s' is prohibited", key.second, key.first));
         }
     }
 

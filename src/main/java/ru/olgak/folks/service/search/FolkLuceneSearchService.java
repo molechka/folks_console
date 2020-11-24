@@ -2,7 +2,9 @@ package ru.olgak.folks.service.search;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
@@ -62,12 +64,15 @@ public class FolkLuceneSearchService implements SearchService<Folk>, Initializin
         searcherManager = accessor.createSearcherManager();
     }
 
+    @SneakyThrows
     @Override
     public void rebuild() throws IOException {
-        accessor.retrieveWriter().deleteAll();
+        IndexWriter indexWriter = accessor.retrieveWriter();
+        indexWriter.deleteAll();
+
         List<Folk> all = folkRepository.findAll();
-        LuceneModifierCallback insertCallback = LuceneModifierUtil.createInsertCallback(searchBinder, all);
-        LuceneModifierUtil.doWithCallback("rebuild", accessor, insertCallback);
+        LuceneModifyOperation.ModifyResult result = new LuceneModifyUtil.BatchInsert().process(accessor.retrieveWriter(), searchBinder, all);
+        accessor.commitWriter(indexWriter, result.getChangedEssences().size(), result.getCommitMode());
     }
 
     @Override
@@ -140,7 +145,7 @@ public class FolkLuceneSearchService implements SearchService<Folk>, Initializin
         // Формируем и возвращает созданную пару
         resultQuery = resultQuery != null ? resultQuery : new MatchAllDocsQuery();
         Sort sort = sortFields != null && !sortFields.isEmpty() ? new Sort(sortFields.toArray(new SortField[sortFields.size()])) : null;
-        return new LuceneQueryDescriptor(resultQuery, sort, null, 0, Integer.MAX_VALUE);
+        return new LuceneQueryDescriptor(resultQuery, sort, null, 0, 100_000);
     }
 
     public Set<SortField> buildOrder(Class<Folk> searchClass, String orderKey, SortOrder orderValue) {
