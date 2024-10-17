@@ -1,0 +1,15 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Mon Nov 23 22:16:29 MSK 2020
+utils-io-20.15-SNAPSHOT.pom>=
+utils-io-20.15-20201106.142139-10.jar>maven.hflabs.ru=
+utils-io-20.15-20201106.142139-10.pom>maven.hflabs.ru=
+utils-io-20.15-20201114.030055-13.jar>maven.hflabs.ru=
+utils-io-20.15-SNAPSHOT-tests.jar>=
+utils-io-20.15-20201114.030055-13.pom>maven.hflabs.ru=
+utils-io-20.15-SNAPSHOT-test-sources.jar>=
+utils-io-20.15-20201121.031905-17.jar>maven.hflabs.ru=
+utils-io-20.15-SNAPSHOT.jar>=
+utils-io-20.15-20201110.083434-12.jar>maven.hflabs.ru=
+utils-io-20.15-20201121.031905-17.pom>maven.hflabs.ru=
+utils-io-20.15-20201110.083434-12.pom>maven.hflabs.ru=
+utils-io-20.15-SNAPSHOT-sources.jar>=

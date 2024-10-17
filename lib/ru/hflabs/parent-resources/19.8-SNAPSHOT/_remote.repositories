@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Nov 11 09:59:13 MSK 2020
+parent-resources-19.8-SNAPSHOT.jar>=
+parent-resources-19.8-SNAPSHOT-sources.jar>=
+parent-resources-19.8-SNAPSHOT.pom>=
