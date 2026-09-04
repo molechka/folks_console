@@ -1,6 +1,6 @@
 # This dockerfile for testing build in isolated environment !!!
 
-FROM adoptopenjdk/openjdk11:jdk-11.0.8_10-ubuntu
+FROM eclipse-temurin:25-jdk
 
 WORKDIR /app
 

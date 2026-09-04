@@ -51,7 +51,7 @@
         <!-- ############################################################################ -->
         <!-- Build properties -->
         <!-- ############################################################################ -->
-        <j2se.version>11</j2se.version>
+        <j2se.version>25</j2se.version>
         <j2se.debug>true</j2se.debug>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.version>3.5</maven.build.version>

@@ -22,6 +22,10 @@
     <properties>
         <ru.hflabs.util.version>20.15-SNAPSHOT</ru.hflabs.util.version>
         <maven.checkstyle.skip>true</maven.checkstyle.skip>
+        <j2se.version>25</j2se.version>
+        <lombok.version>1.18.48</lombok.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
     </properties>
 
     <build>
@@ -30,8 +34,25 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Spring 5.2 (Boot 2.3) shades ASM that cannot read class file 69; JDK 25 compiles Java 11 bytecode. -->
+                    <release>11</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine/>
                     <includes>
                         <include>**/*Test*.java</include>
                         <include>**/*Case*.java</include>
@@ -106,6 +127,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
