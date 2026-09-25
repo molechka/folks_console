@@ -14,8 +14,15 @@
         </jaxws:properties>
     </jaxws:endpoint>
 
+    <bean id="folkStore" class="ru.olgak.folks.service.FolkStore">
+        <constructor-arg name="folkRepository" ref="folkRepository"/>
+        <constructor-arg name="entityManagerFactory" ref="entityManagerFactory"/>
+        <constructor-arg name="searchService" ref="searchService"/>
+    </bean>
+
     <bean id="folksWS" class="ru.olgak.folks.soap.FolksWSImpl">
         <constructor-arg name="searchService" ref="searchService"/>
+        <constructor-arg name="folkStore" ref="folkStore"/>
     </bean>
 
 </beans>

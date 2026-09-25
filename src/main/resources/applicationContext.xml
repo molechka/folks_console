@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <import resource="classpath:services-database.xml"/>
+    <import resource="classpath:services-search.xml"/>
+    <import resource="classpath:services-soap.xml"/>
+    <import resource="classpath:services-rest.xml"/>
+
+    <bean id="demoDataInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer" depends-on="entityManagerFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="databasePopulator">
+            <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+                <property name="scripts">
+                    <list>
+                        <value>classpath:data.sql</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="folkBootstrap" class="ru.olgak.folks.app.FolkBootstrap" depends-on="demoDataInitializer" init-method="start">
+        <constructor-arg name="searchService" ref="searchService"/>
+    </bean>
+
+    <jaxrs:server id="folksUi" address="http://localhost:8088/ui">
+        <jaxrs:serviceBeans>
+            <bean class="ru.olgak.folks.app.FolksUiResource"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
+</beans>

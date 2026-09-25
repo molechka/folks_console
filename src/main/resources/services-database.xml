@@ -9,15 +9,26 @@
                            http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
                            http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <jpa:repositories base-package="ru.olgak.folks.service.dao"/>
+    <jpa:repositories base-package="ru.olgak.folks.service.dao"
+                      factory-class="ru.olgak.folks.service.dao.FolkRepositoryFactoryBean"/>
 
     <jdbc:embedded-database id="dataSource" type="HSQL"/>
 
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="schemaInitializer" class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
         <property name="dataSource" ref="dataSource"/>
-        <property name="loadTimeWeaver">
-            <bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver"/>
+        <property name="databasePopulator">
+            <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+                <property name="scripts">
+                    <list>
+                        <value>classpath:schema.sql</value>
+                    </list>
+                </property>
+            </bean>
         </property>
+    </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="schemaInitializer">
+        <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan" value="ru.olgak.folks.api"/>
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>

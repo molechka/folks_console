@@ -27,4 +27,32 @@ public interface FolksWS {
             @WebParam(partName = "parameters", name = "search", targetNamespace = "http://olgak.ru/folks/v1")
                     Search parameters
     );
+
+    @WebMethod(action = "http://olgak.ru/soap/services/folks/create")
+    @WebResult(name = "folkResponse", targetNamespace = "http://olgak.ru/folks/v1", partName = "parameters")
+    public FolkResponse create(
+            @WebParam(partName = "parameters", name = "create", targetNamespace = "http://olgak.ru/folks/v1")
+                    CreateRequest parameters
+    );
+
+    @WebMethod(action = "http://olgak.ru/soap/services/folks/update")
+    @WebResult(name = "folkResponse", targetNamespace = "http://olgak.ru/folks/v1", partName = "parameters")
+    public FolkResponse update(
+            @WebParam(partName = "parameters", name = "update", targetNamespace = "http://olgak.ru/folks/v1")
+                    UpdateRequest parameters
+    );
+
+    @WebMethod(action = "http://olgak.ru/soap/services/folks/getById")
+    @WebResult(name = "folkResponse", targetNamespace = "http://olgak.ru/folks/v1", partName = "parameters")
+    public FolkResponse getById(
+            @WebParam(partName = "parameters", name = "getById", targetNamespace = "http://olgak.ru/folks/v1")
+                    IdRequest parameters
+    );
+
+    @WebMethod(action = "http://olgak.ru/soap/services/folks/delete")
+    @WebResult(name = "deleteResponse", targetNamespace = "http://olgak.ru/folks/v1", partName = "parameters")
+    public DeleteResponse delete(
+            @WebParam(partName = "parameters", name = "delete", targetNamespace = "http://olgak.ru/folks/v1")
+                    DeleteRequest parameters
+    );
 }

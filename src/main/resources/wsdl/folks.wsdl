@@ -50,6 +50,62 @@
                 </xs:simpleContent>
             </xs:complexType>
 
+            <xs:element name="create">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="folk" type="tns:WFolk"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="update">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="folk" type="tns:WFolk"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="getById">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="id" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="delete">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="id" type="xs:long"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="folkResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="folk" type="tns:WFolk" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="deleteResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="id" type="xs:long" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:complexType name="WFolk">
+                <xs:sequence>
+                    <xs:element name="field" type="tns:WField" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="attribute" type="tns:WAttribute" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="id" type="xs:long"/>
+            </xs:complexType>
+
             <xs:complexType name="WInclude">
                 <xs:sequence>
                     <xs:element name="info" maxOccurs="unbounded">
@@ -72,6 +128,24 @@
     <message name="searchSoapOut">
         <part name="parameters" element="tns:searchResponse"/>
     </message>
+    <message name="createSoapIn">
+        <part name="parameters" element="tns:create"/>
+    </message>
+    <message name="updateSoapIn">
+        <part name="parameters" element="tns:update"/>
+    </message>
+    <message name="getByIdSoapIn">
+        <part name="parameters" element="tns:getById"/>
+    </message>
+    <message name="deleteSoapIn">
+        <part name="parameters" element="tns:delete"/>
+    </message>
+    <message name="folkSoapOut">
+        <part name="parameters" element="tns:folkResponse"/>
+    </message>
+    <message name="deleteSoapOut">
+        <part name="parameters" element="tns:deleteResponse"/>
+    </message>
 
     <!--    <message name="errorResponse">
             <part name="errorMessage" element="tns:errorMessage"/>
@@ -82,6 +156,22 @@
             <input message="tns:searchSoapIn"/>
             <output message="tns:searchSoapOut"/>
             <!--<fault name="errorOrWarning" message="tns:errorResponse"/>-->
+        </operation>
+        <operation name="create">
+            <input message="tns:createSoapIn"/>
+            <output message="tns:folkSoapOut"/>
+        </operation>
+        <operation name="update">
+            <input message="tns:updateSoapIn"/>
+            <output message="tns:folkSoapOut"/>
+        </operation>
+        <operation name="getById">
+            <input message="tns:getByIdSoapIn"/>
+            <output message="tns:folkSoapOut"/>
+        </operation>
+        <operation name="delete">
+            <input message="tns:deleteSoapIn"/>
+            <output message="tns:deleteSoapOut"/>
         </operation>
     </portType>
 
@@ -98,6 +188,26 @@
             <!--<fault name="errorOrWarning">
                 <soap:fault name="errorOrWarning" use="literal"/>
             </fault>-->
+        </operation>
+        <operation name="create">
+            <soap:operation soapAction="http://olgak.ru/soap/services/folks/create" style="document"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="update">
+            <soap:operation soapAction="http://olgak.ru/soap/services/folks/update" style="document"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="getById">
+            <soap:operation soapAction="http://olgak.ru/soap/services/folks/getById" style="document"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
+        </operation>
+        <operation name="delete">
+            <soap:operation soapAction="http://olgak.ru/soap/services/folks/delete" style="document"/>
+            <input><soap:body use="literal"/></input>
+            <output><soap:body use="literal"/></output>
         </operation>
     </binding>
 

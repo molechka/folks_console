@@ -71,7 +71,7 @@ public class FolkLuceneSearchService implements SearchService<Folk>, Initializin
         indexWriter.deleteAll();
 
         List<Folk> all = folkRepository.findAll();
-        LuceneModifyOperation.ModifyResult result = new LuceneModifyUtil.BatchInsert().process(accessor.retrieveWriter(), searchBinder, all);
+        LuceneModifyOperation.ModifyResult result = new LuceneModifyUtil.BatchInsert().process(indexWriter, searchBinder, all);
         accessor.commitWriter(indexWriter, result.getChangedEssences().size(), result.getCommitMode());
     }
 

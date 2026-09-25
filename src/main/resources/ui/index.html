@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Folks</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4f1ea;
+            --ink: #1c1915;
+            --muted: #6d655c;
+            --card: #fffdf8;
+            --line: #e4dcd0;
+            --accent: #0f6e56;
+            --accent-ink: #ffffff;
+            --danger: #9b2335;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+        header { padding: 28px 32px 12px; }
+        h1 { margin: 0 0 6px; font-size: 28px; }
+        p.lead { margin: 0; color: var(--muted); }
+        #search-form {
+            display: flex;
+            gap: 8px;
+            padding: 16px 32px 8px;
+        }
+        input, select {
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--card);
+            color: var(--ink);
+        }
+        input[type="search"] { flex: 1; }
+        button {
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+        button.danger { background: transparent; color: var(--danger); border: 1px solid #e7c5cb; }
+        button.small { padding: 6px 10px; font-size: 14px; }
+        .status { padding: 0 32px 8px; color: var(--muted); min-height: 1.2em; }
+        .wrap { padding: 0 32px 32px; overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+        th { font-size: 13px; color: var(--muted); font-weight: 600; }
+        tr:last-child td { border-bottom: 0; }
+        .actions { white-space: nowrap; display: flex; gap: 6px; }
+        .error { color: var(--danger); }
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 25, 21, 0.35);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 48px 16px;
+        }
+        .backdrop[hidden] { display: none; }
+        #editor-form {
+            width: min(560px, 100%);
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            display: grid;
+            gap: 12px;
+        }
+        #editor-form h2 { margin: 0; }
+        label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+        .form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Участники</h1>
+    <p class="lead">Поиск, создание, изменение и удаление через REST.</p>
+</header>
+<form id="search-form">
+    <input id="query" type="search" placeholder="Фамилия, имя, компания…" autofocus>
+    <button type="submit">Найти</button>
+    <button class="secondary" type="button" id="show-all">Все</button>
+    <button type="button" id="create">Создать</button>
+</form>
+<div class="status" id="status"></div>
+<div class="wrap">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+            <th>Компания</th>
+            <th>Должность</th>
+            <th>Город</th>
+            <th>Устройства</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+    </table>
+</div>
+<div class="backdrop" id="editor" hidden>
+    <form id="editor-form">
+        <h2 id="editor-title">Новый участник</h2>
+        <input type="hidden" id="editor-id">
+        <label>Фамилия
+            <input id="field-surname" name="surname" required>
+        </label>
+        <label>Имя
+            <input id="field-name" name="name">
+        </label>
+        <label>Отчество
+            <input id="field-patronymic" name="patronymic">
+        </label>
+        <label>Компания
+            <input id="field-company" name="company">
+        </label>
+        <label>Должность
+            <input id="field-position" name="position">
+        </label>
+        <label>Город
+            <input id="field-city" name="city">
+        </label>
+        <div class="form-actions">
+            <button class="secondary" type="button" id="editor-cancel">Отмена</button>
+            <button type="submit" id="editor-save">Сохранить</button>
+        </div>
+    </form>
+</div>
+<script>
+    const API = '/rest/services/folks/v1';
+    const FORM_FIELDS = ['surname', 'name', 'patronymic', 'company', 'position', 'city'];
+    const searchForm = document.getElementById('search-form');
+    const queryInput = document.getElementById('query');
+    const statusNode = document.getElementById('status');
+    const rows = document.getElementById('rows');
+    const editor = document.getElementById('editor');
+    const editorForm = document.getElementById('editor-form');
+    const editorTitle = document.getElementById('editor-title');
+    const editorId = document.getElementById('editor-id');
+    const folksById = {};
+
+    function fieldMap(folk) {
+        const map = {};
+        (folk.field || []).forEach(function (item) {
+            map[item.name] = item.value;
+        });
+        return map;
+    }
+
+    function devices(folk) {
+        return (folk.attribute || []).map(function (attribute) {
+            const map = {};
+            (attribute.field || []).forEach(function (item) {
+                map[item.name] = item.value;
+            });
+            return [map.model, map.os].filter(Boolean).join(' / ');
+        }).filter(Boolean).join(', ');
+    }
+
+    function cell(value) {
+        const td = document.createElement('td');
+        td.textContent = value == null || value === '' ? '—' : value;
+        return td;
+    }
+
+    function fieldsPayload() {
+        return FORM_FIELDS.map(function (name) {
+            return { name: name, value: document.getElementById('field-' + name).value.trim() };
+        });
+    }
+
+    async function api(path, options) {
+        const response = await fetch(API + path, options);
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+    }
+
+    function setStatus(text, isError) {
+        statusNode.textContent = text;
+        statusNode.className = isError ? 'status error' : 'status';
+    }
+
+    function openEditor(folk) {
+        const fields = folk ? fieldMap(folk) : {};
+        editorId.value = folk ? String(folk.id) : '';
+        editorTitle.textContent = folk ? 'Изменить участника' : 'Новый участник';
+        FORM_FIELDS.forEach(function (name) {
+            document.getElementById('field-' + name).value = fields[name] || '';
+        });
+        editor.hidden = false;
+        document.getElementById('field-surname').focus();
+    }
+
+    function closeEditor() {
+        editor.hidden = true;
+        editorForm.reset();
+    }
+
+    async function search(query) {
+        setStatus('Ищем…');
+        rows.innerHTML = '';
+        try {
+            const data = await api('/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query })
+            });
+            const folks = data.folk || [];
+            Object.keys(folksById).forEach(function (key) { delete folksById[key]; });
+            folks.forEach(function (folk) {
+                folksById[folk.id] = folk;
+                const fields = fieldMap(folk);
+                const tr = document.createElement('tr');
+                tr.appendChild(cell(folk.id));
+                tr.appendChild(cell(fields.surname));
+                tr.appendChild(cell(fields.name));
+                tr.appendChild(cell(fields.patronymic));
+                tr.appendChild(cell(fields.company));
+                tr.appendChild(cell(fields.position));
+                tr.appendChild(cell(fields.city));
+                tr.appendChild(cell(devices(folk)));
+                const actions = document.createElement('td');
+                actions.className = 'actions';
+                const edit = document.createElement('button');
+                edit.type = 'button';
+                edit.className = 'secondary small';
+                edit.textContent = 'Изменить';
+                edit.addEventListener('click', function () { openEditor(folk); });
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'danger small';
+                remove.textContent = 'Удалить';
+                remove.addEventListener('click', function () { removeFolk(folk, fields); });
+                actions.appendChild(edit);
+                actions.appendChild(remove);
+                tr.appendChild(actions);
+                rows.appendChild(tr);
+            });
+            setStatus(folks.length === 0 ? 'Никого не нашли' : 'Найдено: ' + folks.length);
+        } catch (error) {
+            setStatus('Не удалось выполнить search: ' + error.message, true);
+        }
+    }
+
+    async function saveFolk(event) {
+        event.preventDefault();
+        const id = editorId.value;
+        const body = { folk: { field: fieldsPayload() } };
+        if (id) {
+            body.folk.id = Number(id);
+        }
+        const path = id ? '/update' : '/create';
+        try {
+            await api(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            closeEditor();
+            setStatus(id ? 'Участник обновлён' : 'Участник создан');
+            await search(queryInput.value.trim());
+        } catch (error) {
+            setStatus('Не удалось сохранить: ' + error.message, true);
+        }
+    }
+
+    async function removeFolk(folk, fields) {
+        const name = [fields.surname, fields.name].filter(Boolean).join(' ') || ('#' + folk.id);
+        if (!window.confirm('Удалить ' + name + '?')) {
+            return;
+        }
+        try {
+            await api('/' + folk.id, { method: 'DELETE' });
+            setStatus('Участник удалён');
+            await search(queryInput.value.trim());
+        } catch (error) {
+            setStatus('Не удалось удалить: ' + error.message, true);
+        }
+    }
+
+    searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        search(queryInput.value.trim());
+    });
+    document.getElementById('show-all').addEventListener('click', function () {
+        queryInput.value = '';
+        search('');
+    });
+    document.getElementById('create').addEventListener('click', function () {
+        openEditor(null);
+    });
+    document.getElementById('editor-cancel').addEventListener('click', closeEditor);
+    editor.addEventListener('click', function (event) {
+        if (event.target === editor) {
+            closeEditor();
+        }
+    });
+    editorForm.addEventListener('submit', saveFolk);
+    search('');
+</script>
+</body>
+</html>
