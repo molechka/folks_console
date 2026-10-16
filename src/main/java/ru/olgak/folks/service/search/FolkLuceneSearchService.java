@@ -68,11 +68,21 @@ public class FolkLuceneSearchService implements SearchService<Folk>, Initializin
     @Override
     public void rebuild() throws IOException {
         IndexWriter indexWriter = accessor.retrieveWriter();
-        indexWriter.deleteAll();
+        // commitWriter отпускает блокировку сам. Если упасть раньше, writer остаётся
+        // захваченным и следующие create зависают навсегда.
+        boolean handedOff = false;
+        try {
+            indexWriter.deleteAll();
 
-        List<Folk> all = folkRepository.findAll();
-        LuceneModifyOperation.ModifyResult result = new LuceneModifyUtil.BatchInsert().process(indexWriter, searchBinder, all);
-        accessor.commitWriter(indexWriter, result.getChangedEssences().size(), result.getCommitMode());
+            List<Folk> all = folkRepository.findAll();
+            LuceneModifyOperation.ModifyResult result = new LuceneModifyUtil.BatchInsert().process(indexWriter, searchBinder, all);
+            handedOff = true;
+            accessor.commitWriter(indexWriter, result.getChangedEssences().size(), result.getCommitMode());
+        } finally {
+            if (!handedOff) {
+                accessor.rollbackWriter(indexWriter);
+            }
+        }
     }
 
     @Override

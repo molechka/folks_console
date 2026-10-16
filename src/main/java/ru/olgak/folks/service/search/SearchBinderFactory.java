@@ -5,6 +5,7 @@ import com.google.common.collect.Collections2;
 import lombok.ToString;
 import org.apache.lucene.document.*;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 import org.springframework.util.ClassUtils;
@@ -136,6 +137,11 @@ public class SearchBinderFactory<E extends Folk> {
                     for (Device device : devices) {
                         Document attributeDocument = doBuildDocument(Device.class, device);
                         for (IndexableField attributeField : attributeDocument) {
+                            // DocValues в документе однозначные: второе устройство с тем же
+                            // именем поля (Device.model, Device.type) иначе роняет rebuild.
+                            if (isDuplicateDocValues(result, attributeField)) {
+                                continue;
+                            }
                             result.add(attributeField);
                         }
                     }
@@ -148,6 +154,26 @@ public class SearchBinderFactory<E extends Folk> {
                 return result;
             }
         };
+    }
+
+    /**
+     * В документе участника уже есть DocValues с таким именем.
+     * Текстовые поля устройств при этом остаются: по ним ищет полнотекст.
+     */
+    private static boolean isDuplicateDocValues(Document document, IndexableField candidate) {
+        if (candidate.fieldType().docValuesType() == DocValuesType.NONE) {
+            return false;
+        }
+        IndexableField[] existing = document.getFields(candidate.name());
+        if (existing == null) {
+            return false;
+        }
+        for (IndexableField field : existing) {
+            if (field.fieldType().docValuesType() != DocValuesType.NONE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Object getFieldValue(Object entity, SearchableField field) throws IllegalAccessException {
