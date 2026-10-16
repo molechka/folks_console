@@ -1,0 +1,196 @@
+Базовый адрес: http://localhost:8088/rest/services/folks/v1
+Content-Type для тел запросов: application/json
+Даты: dd.MM.yyyy
+
+Поля участника и устройства передаются списком { "name", "value" }.
+Устройство — элемент attribute с type = DEVICE.
+Перечисления: gender = UNKNOWN | MALE | FAMALE; vipFlag = UNKNOWN | FALSE | TRUE;
+type устройства = UNKNOWN | IPHONE | IPAD | SAMSUNG | LENOVO | NOKIA | BLACKBERRY | WINDOWSPHONE | YOTAPHONE | OTHERS;
+os = UNKNOWN | IOS | ANDROID | WINDOWS | OTHERS.
+Булевы speaker и organizator: true | false.
+
+Ответы create, update и getById возвращают все поля Folk и вложенные DEVICE.
+Ниже показан сокращённый вид: в реальном ответе есть и пустые поля.
+
+
+Поиск
+-----
+POST /search
+
+Запрос:
+{
+  "query": "Иванов"
+}
+
+Ответ:
+{
+  "folk": [
+    {
+      "id": 1,
+      "field": [
+        { "name": "surname", "value": "Иванов" },
+        { "name": "name", "value": "Пётр" },
+        { "name": "patronymic", "value": "Сергеевич" },
+        { "name": "company", "value": "ОАО Ромашка" }
+      ],
+      "attribute": [
+        {
+          "id": 1,
+          "type": "DEVICE",
+          "field": [
+            { "name": "type", "value": "IPAD" },
+            { "name": "os", "value": "IOS" },
+            { "name": "model", "value": "iPad" },
+            { "name": "serialNumber", "value": "X234F" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+Пустой query возвращает всех участников:
+{ "query": "" }
+
+
+Создание
+--------
+POST /create
+
+Запрос:
+{
+  "folk": {
+    "field": [
+      { "name": "surname", "value": "Петров" },
+      { "name": "name", "value": "Иван" },
+      { "name": "patronymic", "value": "Сергеевич" },
+      { "name": "preferredName", "value": "Ваня" },
+      { "name": "gender", "value": "MALE" },
+      { "name": "birthDate", "value": "12.03.1984" },
+      { "name": "birthPlace", "value": "Москва" },
+      { "name": "firstConfDate", "value": "01.06.2018" },
+      { "name": "company", "value": "ОАО Ромашка" },
+      { "name": "position", "value": "Java Developer" },
+      { "name": "jobStartDate", "value": "15.03.2019" },
+      { "name": "author", "value": "seed" },
+      { "name": "city", "value": "Москва" },
+      { "name": "speaker", "value": "true" },
+      { "name": "organizator", "value": "false" },
+      { "name": "vipFlag", "value": "TRUE" },
+      { "name": "visitCount", "value": "4" },
+      { "name": "averageRating", "value": "4.80" },
+      { "name": "language", "value": "ru" },
+      { "name": "actualityDate", "value": "01.01.2024" }
+    ],
+    "attribute": [
+      {
+        "type": "DEVICE",
+        "field": [
+          { "name": "type", "value": "IPAD" },
+          { "name": "os", "value": "IOS" },
+          { "name": "model", "value": "iPad" },
+          { "name": "serialNumber", "value": "X234F" },
+          { "name": "author", "value": "seed" },
+          { "name": "actualityDate", "value": "01.01.2024" }
+        ]
+      }
+    ]
+  }
+}
+
+Ответ: тот же участник с выданным id и id устройства.
+{
+  "folk": {
+    "id": 5,
+    "field": [
+      { "name": "surname", "value": "Петров" },
+      { "name": "name", "value": "Иван" }
+    ],
+    "attribute": [
+      {
+        "id": 3,
+        "type": "DEVICE",
+        "field": [
+          { "name": "type", "value": "IPAD" },
+          { "name": "model", "value": "iPad" }
+        ]
+      }
+    ]
+  }
+}
+
+
+Изменение
+---------
+POST /update
+
+Нужен id участника. Обновляются только переданные поля folk. Устройства этим методом не меняются.
+
+Запрос:
+{
+  "folk": {
+    "id": 1,
+    "field": [
+      { "name": "surname", "value": "Иванов" },
+      { "name": "name", "value": "Пётр" },
+      { "name": "company", "value": "HFLabs" },
+      { "name": "position", "value": "Java Developer" },
+      { "name": "city", "value": "Москва" },
+      { "name": "speaker", "value": "true" }
+    ]
+  }
+}
+
+Ответ — FolkResponse, как у создания, с актуальными полями участника.
+
+
+Чтение по id
+------------
+GET /{id}
+
+Тела нет.
+GET /1
+
+POST /getById
+
+Запрос:
+{ "id": 1 }
+
+Оба варианта возвращают FolkResponse:
+{
+  "folk": {
+    "id": 1,
+    "field": [
+      { "name": "surname", "value": "Иванов" },
+      { "name": "name", "value": "Пётр" },
+      { "name": "patronymic", "value": "Сергеевич" },
+      { "name": "company", "value": "ОАО Ромашка" }
+    ],
+    "attribute": [
+      {
+        "id": 1,
+        "type": "DEVICE",
+        "field": [
+          { "name": "model", "value": "iPad" },
+          { "name": "os", "value": "IOS" }
+        ]
+      }
+    ]
+  }
+}
+
+
+Удаление
+--------
+DELETE /{id}
+
+Тела нет.
+DELETE /1
+
+POST /delete
+
+Запрос:
+{ "id": 1 }
+
+Оба варианта возвращают:
+{ "id": 1 }
